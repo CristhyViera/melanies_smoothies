@@ -50,12 +50,18 @@ if ingredients_list:
 
     # Botón de envío de orden
     if st.button("Submit Order"):
-        session.sql(
-            f"""
+        # Limpiamos el string de ingredientes y preparamos el SQL
+        # Usamos .upper() para el booleano por si acaso, aunque Snowflake acepta TRUE/FALSE
+        my_insert_stmt = f"""
             INSERT INTO smoothies.public.orders (NAME_ON_ORDER, INGREDIENTS, ORDER_FILLED)
             VALUES ('{name_on_order}', '{ingredients_string.strip()}', {order_filled_status})
-            """
-        ).collect()
+        """
+        
+        # Opcional: Descomenta la siguiente línea para ver el error real si falla
+        # st.write(my_insert_stmt) 
 
-        st.success("✅ Your Smoothie Order has been placed!")
-
+        try:
+            session.sql(my_insert_stmt).collect()
+            st.success(f"✅ Your Smoothie Order has been placed, {name_on_order}!")
+        except Exception as e:
+            st.error(f"Something went wrong: {e}")
