@@ -23,8 +23,8 @@ my_dataframe = session.table("smoothies.public.fruit_options").select(col('FRUIT
 pd_df = my_dataframe.to_pandas()
 
 # Opcional: Descomenta estas dos líneas para ver la tabla de búsqueda y detener la app (como en la imagen)
-# st.dataframe(data=pd_df, use_container_width=True)
-# st.stop()
+st.dataframe(pd_df)
+st.stop()
 
 # Convertir la columna FRUIT_NAME en una lista para el multiselect
 fruit_list = pd_df['FRUIT_NAME'].tolist()
