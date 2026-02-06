@@ -15,17 +15,12 @@ st.write("The name on your Smoothie will be:", name_on_order)
 cnx = st.connection("snowflake")
 session = cnx.session()
 
-# --- CARGA DE DATOS (Challenge Lab) ---
+# --- CARGA DE DATOS ---
 # Cargamos FRUIT_NAME para la lista y SEARCH_ON para la API
 my_dataframe = session.table("smoothies.public.fruit_options").select(col('FRUIT_NAME'), col('SEARCH_ON'))
 
 # Convertimos a Pandas para usar la función LOC
 pd_df = my_dataframe.to_pandas()
-
-# --- BLOQUE DE DEPURACIÓN (Comenta estas líneas para que la app avance) ---
-# st.dataframe(pd_df)
-# st.stop() 
-# -----------------------------------------------------------------------
 
 # Convertir la columna FRUIT_NAME en una lista para el multiselect
 fruit_list = pd_df['FRUIT_NAME'].tolist()
@@ -44,20 +39,17 @@ if ingredients_list:
     for fruit_chosen in ingredients_list:
         ingredients_string += fruit_chosen + ' '
         
-        # BUSCAR EL VALOR DE SEARCH_ON: Usamos LOC para encontrar el valor de búsqueda correcto
+        # BUSCAR EL VALOR DE SEARCH_ON usando LOC
         search_on = pd_df.loc[pd_df['FRUIT_NAME'] == fruit_chosen, 'SEARCH_ON'].iloc[0]
-        st.write('The search value for ', fruit_chosen, ' is ', search_on, '.') #
+        st.write('The search value for ', fruit_chosen, ' is ', search_on, '.') 
         
         st.subheader(fruit_chosen + ' Nutrition Information')
         
-        # PETICIÓN A LA API: Usamos la variable search_on en la URL
-        fruityvice_response = requests.get("https://fruityvice.com/api/fruit/" + search_on)
+        # PETICIÓN A LA API usando f-string y la variable search_on
+        smoothiefroot_response = requests.get(f"https://my.smoothiefroot.com/api/fruit/{search_on}")
         
-        # MOSTRAR DATOS: Mostramos el JSON en un dataframe de Streamlit
-        if fruityvice_response.status_code == 200:
-            st.dataframe(data=fruityvice_response.json(), use_container_width=True)
-        else:
-            st.warning(f"No nutritional information found for {fruit_chosen}")
+        # MOSTRAR DATOS en un dataframe usando .json()
+        sf_df = st.dataframe(data=smoothiefroot_response.json(), use_container_width=True)
 
     # Botón de envío de orden
     if st.button("Submit Order"):
@@ -69,6 +61,5 @@ if ingredients_list:
         ).collect()
 
         st.success("✅ Your Smoothie Order has been placed!")
-
 
 
