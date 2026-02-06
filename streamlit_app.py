@@ -19,12 +19,13 @@ session = cnx.session()
 # Cargamos FRUIT_NAME para la lista y SEARCH_ON para la API
 my_dataframe = session.table("smoothies.public.fruit_options").select(col('FRUIT_NAME'), col('SEARCH_ON'))
 
-# Convertimos a Pandas para buscar valores fácilmente
+# Convertimos a Pandas para usar la función LOC
 pd_df = my_dataframe.to_pandas()
 
-# Opcional: Descomenta estas dos líneas para ver la tabla de búsqueda y detener la app (como en la imagen)
-st.dataframe(pd_df)
-st.stop()
+# --- BLOQUE DE DEPURACIÓN (Comenta estas líneas para que la app avance) ---
+# st.dataframe(pd_df)
+# st.stop() 
+# -----------------------------------------------------------------------
 
 # Convertir la columna FRUIT_NAME en una lista para el multiselect
 fruit_list = pd_df['FRUIT_NAME'].tolist()
@@ -43,20 +44,20 @@ if ingredients_list:
     for fruit_chosen in ingredients_list:
         ingredients_string += fruit_chosen + ' '
         
-        # Buscamos el valor de SEARCH_ON correspondiente a la fruta elegida
-        search_on=pd_df.loc[pd_df['FRUIT_NAME'] == fruit_chosen, 'SEARCH_ON'].iloc[0]
-        st.write('The search value for ', fruit_chosen,' is ', search_on, '.')
+        # BUSCAR EL VALOR DE SEARCH_ON: Usamos LOC para encontrar el valor de búsqueda correcto
+        search_on = pd_df.loc[pd_df['FRUIT_NAME'] == fruit_chosen, 'SEARCH_ON'].iloc[0]
+        st.write('The search value for ', fruit_chosen, ' is ', search_on, '.') #
         
         st.subheader(fruit_chosen + ' Nutrition Information')
         
-        # Petición a la API usando el valor de SEARCH_ON
-        fruityvice = requests.get("https://fruityvice.com/api/fruit/" + fruit_chosen)
+        # PETICIÓN A LA API: Usamos la variable search_on en la URL
+        fruityvice_response = requests.get("https://fruityvice.com/api/fruit/" + search_on)
         
-        # Muestra la información nutricional en un dataframe
-        if smoothiefroot_response.status_code == 200:
-            sf_df = st.dataframe(data=smoothiefroot_response.json(), use_container_width=True)
+        # MOSTRAR DATOS: Mostramos el JSON en un dataframe de Streamlit
+        if fruityvice_response.status_code == 200:
+            st.dataframe(data=fruityvice_response.json(), use_container_width=True)
         else:
-            st.error(f"No se pudo encontrar información para {fruit_chosen}")
+            st.warning(f"No nutritional information found for {fruit_chosen}")
 
     # Botón de envío de orden
     if st.button("Submit Order"):
