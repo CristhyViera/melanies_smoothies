@@ -1,5 +1,5 @@
 import streamlit as st
-from snowflake.snowpark.functions import col
+#from snowflake.snowpark.functions import col
 
 # Title
 st.title("🥤 Customize Your Smoothie! 🥤")
