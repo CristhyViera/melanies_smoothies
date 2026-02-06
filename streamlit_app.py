@@ -1,8 +1,5 @@
 import streamlit as st
 from snowflake.snowpark.functions import col
-import requests
-smoothiefroot_response = requests.get("https://my.smoothiefroot.com/api/fruit/watermelon")
-st.text(smoothiefroot_response.json())
 
 # Title
 st.title("🥤 Customize Your Smoothie! 🥤")
@@ -49,6 +46,12 @@ if ingredients_list:
         ).collect()
 
         st.success("✅ Your Smoothie Order has been placed!")
+
+#New section to display smoothefroot nutrition information
+import requests
+smoothiefroot_response = requests.get("https://my.smoothiefroot.com/api/fruit/watermelon")
+# st.text(smoothiefroot_response.json())
+sf_df = st.dataframe(data=smoothiefroot_response.json(), use_container_width=True)
 
 
 
