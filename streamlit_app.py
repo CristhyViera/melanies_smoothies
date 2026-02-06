@@ -11,7 +11,7 @@ st.write("The name on your Smoothie will be:", name_on_order)
 
 # Connect to Snowflake (Streamlit Cloud way)
 cnx = st.connection("snowflake")
-session = cnx.session
+session = cnx.session()
 
 # Load fruit options table
 fruit_df = session.table("smoothies.public.fruit_options")
