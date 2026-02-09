@@ -11,7 +11,7 @@ name_on_order = st.text_input("Name on Smoothie:")
 cnx = st.connection("snowflake")
 session = cnx.session()
 
-# Carga de opciones de frutas
+# Carga de datos
 my_dataframe = session.table("smoothies.public.fruit_options").select(col('FRUIT_NAME'), col('SEARCH_ON'))
 pd_df = my_dataframe.to_pandas()
 fruit_list = pd_df['FRUIT_NAME'].tolist()
@@ -23,10 +23,9 @@ ingredients_list = st.multiselect(
 )
 
 if ingredients_list:
-    # 1. Crear el string exacto para el HASH de DORA
+    # IMPORTANTE: Esto crea el string exacto para DORA
     ingredients_string = ' '.join(ingredients_list)
     
-    # 2. Mostrar info nutricional
     for fruit_chosen in ingredients_list:
         search_on = pd_df.loc[pd_df['FRUIT_NAME'] == fruit_chosen, 'SEARCH_ON'].iloc[0]
         st.subheader(fruit_chosen + ' Nutrition Information')
@@ -36,10 +35,11 @@ if ingredients_list:
         except:
             st.error(f"No nutrition info for {fruit_chosen}")
 
-    # 3. Checkbox y Botón (SOLO UNA VEZ)
+    # Estos elementos deben aparecer SOLO UNA VEZ
     order_filled_status = st.checkbox("Mark order as FILLED")
+    submit_button = st.button("Submit Order")
 
-    if st.button("Submit Order"):
+    if submit_button:
         if name_on_order:
             my_insert_stmt = f"""
                 INSERT INTO smoothies.public.orders (NAME_ON_ORDER, INGREDIENTS, ORDER_FILLED)
