@@ -24,6 +24,13 @@ ingredients_list = st.multiselect(
 
 if ingredients_list:
     # IMPORTANTE: Esto crea el string exacto para DORA
+    ordered_ingredients = [
+    fruit for fruit in fruit_list
+    if fruit in ingredients_list
+    ]
+
+    ingredients_string = ' '.join(ordered_ingredients)
+    
     ingredients_string = ' '.join(ingredients_list)
     
     for fruit_chosen in ingredients_list:
